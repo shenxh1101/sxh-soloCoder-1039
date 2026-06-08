@@ -268,5 +268,89 @@ export const mockArticles: Article[] = [
     isTop: false,
     isRecommended: true,
     versions: []
+  },
+  {
+    id: '11',
+    title: '新媒体编辑工作效率提升指南',
+    summary: '作为新媒体编辑，如何通过工具和方法论提升工作效率，实现高质量内容创作...',
+    content: '# 新媒体编辑工作效率提升指南\n\n## 一、内容选题效率\n\n建立选题库，使用模板化工作流...\n\n## 二、写作效率\n\n使用AI辅助写作，建立素材库...\n\n## 三、排版效率\n\n熟练使用排版工具，建立样式库...\n\n## 四、发布效率\n\n定时发布，多平台一键分发...',
+    coverImage: 'https://picsum.photos/id/48/750/500',
+    images: ['https://picsum.photos/id/48/750/500'],
+    tags: ['效率', '编辑', '工具'],
+    status: 'pending',
+    categoryId: '3',
+    categoryName: '内容创作',
+    author: '钱编辑',
+    views: 0,
+    shares: 0,
+    comments: 0,
+    createdAt: '2024-06-07 10:00:00',
+    updatedAt: '2024-06-08 16:00:00',
+    isTop: false,
+    isRecommended: false,
+    versions: [
+      {
+        id: 'v1',
+        version: 1,
+        title: '新媒体编辑工作效率提升指南',
+        summary: '新媒体编辑如何提升工作效率...',
+        content: '# 新媒体编辑工作效率提升指南\n\n## 一、内容选题效率\n\n建立选题库，使用模板化工作流...\n\n## 二、写作效率\n\n使用AI辅助写作，建立素材库...\n\n## 三、排版效率\n\n熟练使用排版工具，建立样式库...\n\n## 四、发布效率\n\n定时发布，多平台一键分发...',
+        createdAt: '2024-06-07 10:00:00',
+        operator: '钱编辑',
+        remark: '初次提交'
+      },
+      {
+        id: 'v2',
+        version: 2,
+        title: '新媒体编辑工作效率提升指南',
+        summary: '作为新媒体编辑，如何通过工具和方法论提升工作效率，实现高质量内容创作...',
+        content: '# 新媒体编辑工作效率提升指南\n\n## 一、内容选题效率\n\n建立选题库，使用模板化工作流...\n\n## 二、写作效率\n\n使用AI辅助写作，建立素材库...\n\n## 三、排版效率\n\n熟练使用排版工具，建立样式库...\n\n## 四、发布效率\n\n定时发布，多平台一键分发...',
+        createdAt: '2024-06-08 16:00:00',
+        operator: '钱编辑',
+        remark: '修改摘要，更详细描述'
+      }
+    ]
+  },
+  {
+    id: '12',
+    title: '2024年内容创业机遇与挑战',
+    summary: '深度分析2024年内容创业的新机遇、新挑战，以及如何抓住风口...',
+    content: '# 2024年内容创业机遇与挑战\n\n## 一、内容创业新机遇\n\n短视频和直播电商的兴起，为内容创业者带来了新的变现渠道...\n\n## 二、面临的挑战\n\n内容同质化严重，用户注意力分散，变现模式单一...\n\n## 三、应对策略\n\n垂直深耕，建立个人IP，多平台布局...',
+    coverImage: 'https://picsum.photos/id/33/750/500',
+    images: ['https://picsum.photos/id/33/750/500'],
+    tags: ['创业', '内容', '2024'],
+    status: 'approved',
+    categoryId: '1',
+    categoryName: '行业分析',
+    author: '孙创业者',
+    views: 0,
+    shares: 0,
+    comments: 0,
+    createdAt: '2024-06-06 14:00:00',
+    updatedAt: '2024-06-09 11:00:00',
+    isTop: false,
+    isRecommended: false,
+    versions: [
+      {
+        id: 'v1',
+        version: 1,
+        title: '2024年内容创业机遇与挑战',
+        summary: '深度分析2024年内容创业的新机遇、新挑战，以及如何抓住风口...',
+        content: '# 2024年内容创业机遇与挑战\n\n## 一、内容创业新机遇\n\n短视频和直播的兴起，为内容创业者带来了新的变现渠道...\n\n## 二、面临的挑战\n\n内容同质化严重，用户注意力分散...\n\n## 三、应对策略\n\n垂直深耕，建立个人IP...',
+        createdAt: '2024-06-06 14:00:00',
+        operator: '孙创业者',
+        remark: '初次提交'
+      },
+      {
+        id: 'v2',
+        version: 2,
+        title: '2024年内容创业机遇与挑战',
+        summary: '深度分析2024年内容创业的新机遇、新挑战，以及如何抓住风口...',
+        content: '# 2024年内容创业机遇与挑战\n\n## 一、内容创业新机遇\n\n短视频和直播电商的兴起，为内容创业者带来了新的变现渠道...\n\n## 二、面临的挑战\n\n内容同质化严重，用户注意力分散，变现模式单一...\n\n## 三、应对策略\n\n垂直深耕，建立个人IP，多平台布局...',
+        createdAt: '2024-06-09 11:00:00',
+        operator: '孙创业者',
+        remark: '补充正文细节'
+      }
+    ]
   }
 ];

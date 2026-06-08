@@ -94,7 +94,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
         </View>
       )}
       
-      {review.reviewComment && (
+      {review.status !== 'pending' && review.reviewComment && (
         <View className={styles.commentBox}>
           <Text className={styles.commentLabel}>审核意见：</Text>
           <Text className={styles.commentText}>{review.reviewComment}</Text>

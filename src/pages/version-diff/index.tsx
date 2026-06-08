@@ -141,17 +141,20 @@ const VersionDiffPage: React.FC = () => {
   };
 
   const computeSmartDiff = (oldText: string, newText: string): DiffSegment[] => {
-    if (!oldText && !newText) return [];
-    if (!oldText) return [{ type: 'added', oldContent: '', newContent: newText }];
-    if (!newText) return [{ type: 'removed', oldContent: oldText, newContent: '' }];
-    if (oldText === newText) return [{ type: 'unchanged', oldContent, newContent }];
+    const safeOld = oldText || '';
+    const safeNew = newText || '';
+    
+    if (!safeOld && !safeNew) return [{ type: 'unchanged', oldContent: '', newContent: '' }];
+    if (!safeOld) return [{ type: 'added', oldContent: '', newContent: safeNew }];
+    if (!safeNew) return [{ type: 'removed', oldContent: safeOld, newContent: '' }];
+    if (safeOld === safeNew) return [{ type: 'unchanged', oldContent: safeOld, newContent: safeNew }];
 
-    const commonParts = findCommonSubstrings(oldText, newText);
+    const commonParts = findCommonSubstrings(safeOld, safeNew);
     
     if (commonParts.length === 0) {
       return [
-        { type: 'removed', oldContent: oldText, newContent: '' },
-        { type: 'added', oldContent: '', newContent: newText }
+        { type: 'removed', oldContent: safeOld, newContent: '' },
+        { type: 'added', oldContent: '', newContent: safeNew }
       ];
     }
 
@@ -172,12 +175,12 @@ const VersionDiffPage: React.FC = () => {
 
     while (commonIndex < commonParts.length) {
       const common = commonParts[commonIndex];
-      const oldCommonPos = oldText.indexOf(common, oldPos);
-      const newCommonPos = newText.indexOf(common, newPos);
+      const oldCommonPos = safeOld.indexOf(common, oldPos);
+      const newCommonPos = safeNew.indexOf(common, newPos);
 
       if (oldCommonPos > oldPos || newCommonPos > newPos) {
-        const oldDiff = oldText.substring(oldPos, oldCommonPos);
-        const newDiff = newText.substring(newPos, newCommonPos);
+        const oldDiff = safeOld.substring(oldPos, oldCommonPos);
+        const newDiff = safeNew.substring(newPos, newCommonPos);
         addModifiedSegment(oldDiff, newDiff);
       }
 
@@ -192,9 +195,9 @@ const VersionDiffPage: React.FC = () => {
       commonIndex++;
     }
 
-    if (oldPos < oldText.length || newPos < newText.length) {
-      const oldDiff = oldText.substring(oldPos);
-      const newDiff = newText.substring(newPos);
+    if (oldPos < safeOld.length || newPos < safeNew.length) {
+      const oldDiff = safeOld.substring(oldPos);
+      const newDiff = safeNew.substring(newPos);
       addModifiedSegment(oldDiff, newDiff);
     }
 
@@ -202,8 +205,10 @@ const VersionDiffPage: React.FC = () => {
   };
 
   const splitIntoBlocks = (oldText: string, newText: string): DiffBlock[] => {
-    const oldLines = oldText.split('\n');
-    const newLines = newText.split('\n');
+    const safeOld = oldText || '';
+    const safeNew = newText || '';
+    const oldLines = safeOld.split('\n');
+    const newLines = safeNew.split('\n');
     const blocks: DiffBlock[] = [];
     
     const maxLines = Math.max(oldLines.length, newLines.length);
@@ -379,11 +384,17 @@ const VersionDiffPage: React.FC = () => {
   };
 
   const renderDiffSegments = (segments: DiffSegment[], showInline: boolean = true) => {
+    if (!segments || segments.length === 0) {
+      return <Text className={styles.diffUnchanged}></Text>;
+    }
+    
     return segments.map((segment, index) => {
+      if (!segment) return null;
+      
       if (segment.type === 'unchanged') {
         return (
           <Text key={index} className={styles.diffUnchanged}>
-            {segment.newContent}
+            {segment.newContent || ''}
           </Text>
         );
       }
@@ -391,7 +402,7 @@ const VersionDiffPage: React.FC = () => {
       if (segment.type === 'removed') {
         return (
           <Text key={index} className={styles.diffRemoved}>
-            {segment.oldContent}
+            {segment.oldContent || ''}
           </Text>
         );
       }
@@ -399,7 +410,7 @@ const VersionDiffPage: React.FC = () => {
       if (segment.type === 'added') {
         return (
           <Text key={index} className={styles.diffAdded}>
-            {segment.newContent}
+            {segment.newContent || ''}
           </Text>
         );
       }
@@ -653,9 +664,9 @@ const VersionDiffPage: React.FC = () => {
           </View>
           {expandedSections.summary && (
             <View className={styles.diffBox}>
-              {(oldVersion.summary || newVersion.summary) 
-                ? renderDiffSegments(summaryDiff, true)
-                : <Text className={styles.emptyText}>无摘要</Text>
+              {(!oldVersion.summary && !newVersion.summary) 
+                ? <Text className={styles.emptyText}>无摘要</Text>
+                : renderDiffSegments(summaryDiff, true)
               }
             </View>
           )}

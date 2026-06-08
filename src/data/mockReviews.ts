@@ -107,5 +107,86 @@ export const mockReviews: ReviewRecord[] = [
     reviewTime: '2024-05-20 12:55:00',
     reviewComment: '前沿话题，观点新颖，建议头条推荐。',
     version: 1
+  },
+  {
+    id: 'r8',
+    articleId: '11',
+    articleTitle: '新媒体编辑工作效率提升指南',
+    articleCover: 'https://picsum.photos/id/48/750/500',
+    status: 'pending',
+    submitter: '钱编辑',
+    submitTime: '2024-06-08 16:00:00',
+    version: 2,
+    history: [
+      {
+        id: 'h3',
+        version: 1,
+        status: 'pending',
+        submitter: '钱编辑',
+        submitTime: '2024-06-07 10:00:00'
+      },
+      {
+        id: 'h4',
+        version: 1,
+        status: 'rejected',
+        submitter: '钱编辑',
+        submitTime: '2024-06-07 10:00:00',
+        reviewer: '张主管',
+        reviewTime: '2024-06-07 15:30:00',
+        reviewComment: '摘要描述不够清晰，建议修改摘要，更详细地描述文章内容。'
+      },
+      {
+        id: 'h5',
+        version: 2,
+        status: 'pending',
+        submitter: '钱编辑',
+        submitTime: '2024-06-08 16:00:00'
+      }
+    ]
+  },
+  {
+    id: 'r9',
+    articleId: '12',
+    articleTitle: '2024年内容创业机遇与挑战',
+    articleCover: 'https://picsum.photos/id/33/750/500',
+    status: 'approved',
+    submitter: '孙创业者',
+    submitTime: '2024-06-09 11:00:00',
+    reviewer: '李总编',
+    reviewTime: '2024-06-09 11:30:00',
+    reviewComment: '内容充实，分析到位，同意通过审核。',
+    version: 2,
+    history: [
+      {
+        id: 'h6',
+        version: 1,
+        status: 'pending',
+        submitter: '孙创业者',
+        submitTime: '2024-06-06 14:00:00',
+        reviewer: undefined,
+        reviewTime: undefined,
+        reviewComment: undefined
+      },
+      {
+        id: 'h7',
+        version: 1,
+        status: 'rejected',
+        submitter: '孙创业者',
+        submitTime: '2024-06-06 14:00:00',
+        reviewer: '张主管',
+        reviewTime: '2024-06-08 10:00:00',
+        reviewComment: '正文内容不够详实，建议补充更多细节和案例。'
+      },
+      {
+        id: 'h8',
+        version: 2,
+        status: 'pending',
+        submitter: '孙创业者',
+        submitTime: '2024-06-09 11:00:00',
+        reviewer: undefined,
+        reviewTime: undefined,
+        reviewComment: undefined
+      }
+    ]
   }
 ];

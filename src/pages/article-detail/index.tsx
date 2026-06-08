@@ -92,10 +92,24 @@ const ArticleDetailPage: React.FC = () => {
 
       <View className={styles.content}>
         <View className={styles.metaSection}>
-          <View className={styles.metaRow}>
-            <Text className={styles.metaLabel}>状态</Text>
-            <StatusTag status={article.status} size="md" />
-          </View>
+          {review && (
+            <View className={styles.metaRow}>
+              <Text className={styles.metaLabel}>审核状态</Text>
+              <StatusTag status={review.status} size="md" />
+            </View>
+          )}
+          {(article.status === 'published' || article.status === 'offline') && (
+            <View className={styles.metaRow}>
+              <Text className={styles.metaLabel}>发布状态</Text>
+              <StatusTag status={article.status} size="md" />
+            </View>
+          )}
+          {!review && article.status !== 'published' && article.status !== 'offline' && (
+            <View className={styles.metaRow}>
+              <Text className={styles.metaLabel}>状态</Text>
+              <StatusTag status={article.status} size="md" />
+            </View>
+          )}
           <View className={styles.metaRow}>
             <Text className={styles.metaLabel}>栏目</Text>
             <Text className={styles.metaValue}>{article.categoryName}</Text>
