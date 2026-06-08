@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Input, ScrollView, Button } from '@tarojs/components';
-import Taro, { usePullDownRefresh, useReachBottom } from '@tarojs/taro';
+import Taro, { usePullDownRefresh, useReachBottom, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import { Article, ArticleStatus } from '@/types/article';
-import { mockArticles } from '@/data/mockArticles';
+import { useAppStore } from '@/store';
 import ArticleCard from '@/components/ArticleCard';
 import styles from './index.module.scss';
 
@@ -15,7 +15,7 @@ interface FilterTab {
 }
 
 const ArticleListPage: React.FC = () => {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const { articles, setCurrentEditingArticleId } = useAppStore();
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -31,25 +31,28 @@ const ArticleListPage: React.FC = () => {
     { key: 'rejected', label: '已退回' }
   ];
 
-  const getCountByStatus = (status: FilterType) => {
-    if (status === 'all') return mockArticles.length;
-    return mockArticles.filter(a => a.status === status).length;
-  };
+  const getCountByStatus = useCallback((status: FilterType) => {
+    if (status === 'all') return articles.length;
+    return articles.filter(a => a.status === status).length;
+  }, [articles]);
 
   const loadData = useCallback(() => {
     setLoading(true);
     console.log('[ArticleList] 加载数据');
     
     setTimeout(() => {
-      setArticles(mockArticles);
       setLoading(false);
       Taro.stopPullDownRefresh();
-    }, 800);
+    }, 500);
   }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useDidShow(() => {
+    console.log('[ArticleList] 页面显示，刷新数据');
+  });
 
   useEffect(() => {
     let result = [...articles];
@@ -100,7 +103,17 @@ const ArticleListPage: React.FC = () => {
   };
 
   const handleArticleClick = (article: Article) => {
-    console.log('[ArticleList] 点击稿件:', article.id);
+    console.log('[ArticleList] 点击稿件:', article.id, article.status);
+    if (article.status === 'draft' || article.status === 'pending' || article.status === 'rejected') {
+      setCurrentEditingArticleId(article.id);
+      Taro.switchTab({
+        url: '/pages/editor/index'
+      });
+    } else {
+      Taro.navigateTo({
+        url: `/pages/article-detail/index?id=${article.id}`
+      });
+    }
   };
 
   return (

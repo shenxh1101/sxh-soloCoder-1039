@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
-import Taro, { usePullDownRefresh } from '@tarojs/taro';
+import Taro, { usePullDownRefresh, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import { ReviewRecord, ReviewStatus } from '@/types/review';
-import { mockReviews } from '@/data/mockReviews';
+import { useAppStore } from '@/store';
 import ReviewItem from '@/components/ReviewItem';
 import styles from './index.module.scss';
 
@@ -15,7 +15,7 @@ interface FilterTab {
 }
 
 const ReviewPage: React.FC = () => {
-  const [reviews, setReviews] = useState<ReviewRecord[]>([]);
+  const { reviews, resubmitReview } = useAppStore();
   const [filteredReviews, setFilteredReviews] = useState<ReviewRecord[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [loading, setLoading] = useState(false);
@@ -27,10 +27,10 @@ const ReviewPage: React.FC = () => {
     { key: 'rejected', label: '已退回' }
   ];
 
-  const getCountByStatus = (status: FilterType) => {
-    if (status === 'all') return mockReviews.length;
-    return mockReviews.filter(r => r.status === status).length;
-  };
+  const getCountByStatus = useCallback((status: FilterType) => {
+    if (status === 'all') return reviews.length;
+    return reviews.filter(r => r.status === status).length;
+  }, [reviews]);
 
   const getStats = () => {
     const pending = reviews.filter(r => r.status === 'pending').length;
@@ -44,15 +44,18 @@ const ReviewPage: React.FC = () => {
     console.log('[Review] 加载审核数据');
     
     setTimeout(() => {
-      setReviews(mockReviews);
       setLoading(false);
       Taro.stopPullDownRefresh();
-    }, 800);
+    }, 500);
   }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useDidShow(() => {
+    console.log('[Review] 页面显示');
+  });
 
   useEffect(() => {
     let result = [...reviews];
@@ -82,7 +85,7 @@ const ReviewPage: React.FC = () => {
   };
 
   const handleResubmit = (review: ReviewRecord) => {
-    console.log('[Review] 重新提交稿件:', review.articleId);
+    console.log('[Review] 重新提交稿件:', review.articleId, review.id);
     Taro.showModal({
       title: '重新提交',
       content: '确定要重新提交此稿件进入审核流程吗？',
@@ -90,15 +93,17 @@ const ReviewPage: React.FC = () => {
         if (res.confirm) {
           Taro.showLoading({ title: '提交中...' });
           setTimeout(() => {
-            Taro.hideLoading();
-            Taro.showToast({ title: '已重新提交', icon: 'success' });
-            console.log('[Review] 稿件已重新提交');
-            setReviews(prev => prev.map(r => 
-              r.id === review.id 
-                ? { ...r, status: 'pending' as const, reviewComment: undefined, reviewer: undefined, reviewTime: undefined }
-                : r
-            ));
-          }, 1000);
+            try {
+              resubmitReview(review.id);
+              Taro.hideLoading();
+              Taro.showToast({ title: '已重新提交', icon: 'success' });
+              console.log('[Review] 稿件已重新提交');
+            } catch (error) {
+              console.error('[Review] 重新提交失败:', error);
+              Taro.hideLoading();
+              Taro.showToast({ title: '提交失败，请重试', icon: 'none' });
+            }
+          }, 500);
         }
       }
     });

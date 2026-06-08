@@ -1,0 +1,256 @@
+@use '@/styles/variables.scss' as *;
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.panel {
+  width: 100%;
+  max-height: 85vh;
+  background: $color-bg-card;
+  border-radius: $radius-2xl $radius-2xl 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-xl $page-padding $spacing-lg;
+  border-bottom: 1rpx solid $color-border-light;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.panelTitle {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.panelSubtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.closeBtn {
+  width: 56rpx;
+  height: 56rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+  border-radius: $radius-pill;
+  margin-left: $spacing-md;
+}
+
+.closeIcon {
+  font-size: 36rpx;
+  color: $color-text-tertiary;
+  line-height: 1;
+}
+
+.panelContent {
+  flex: 1;
+  padding: $spacing-lg $page-padding;
+  min-height: 400rpx;
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.articleList {
+  background: $color-bg-page;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.articleItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1rpx solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.articleCover {
+  width: 120rpx;
+  height: 90rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+  background: $color-bg-tertiary;
+}
+
+.articleInfo {
+  flex: 1;
+  margin-left: $spacing-md;
+  margin-right: $spacing-md;
+  min-width: 0;
+}
+
+.articleTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.articleDesc {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.articleMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.articleDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.articleViews {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.topBtn {
+  flex-shrink: 0;
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-pill;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140rpx;
+}
+
+.topBtnNormal {
+  background: $color-bg-primary-light;
+
+  &::after { border: none; }
+}
+
+.topBtnActive {
+  background: $color-primary;
+
+  &::after { border: none; }
+}
+
+.topBtnText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary;
+}
+
+.topBtnActive .topBtnText {
+  color: $color-text-inverse;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl $page-padding;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+  opacity: 0.4;
+}
+
+.emptyText {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.panelFooter {
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc($spacing-lg + env(safe-area-inset-bottom));
+  border-top: 1rpx solid $color-border-light;
+}
+
+.confirmBtn {
+  width: 100%;
+  height: 88rpx;
+  background: $color-primary-gradient;
+  border-radius: $radius-pill;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after { border: none; }
+}
+
+.confirmBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-inverse;
+}

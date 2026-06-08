@@ -4,27 +4,246 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: $color-bg-page;
+  padding-bottom: $spacing-2xl;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: $page-padding;
-  background-color: $color-bg-page;
+  text-align: center;
 }
 
-.icon {
+.emptyIcon {
   font-size: 160rpx;
   margin-bottom: $spacing-lg;
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
-.title {
+.emptyTitle {
   font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-md;
 }
 
-.desc {
+.emptyDesc {
   font-size: $font-size-md;
   color: $color-text-tertiary;
-  text-align: center;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.articleInfo {
+  padding: $spacing-xl $page-padding $spacing-lg;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-border-light;
+}
+
+.articleTitle {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.articleMeta {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.versionSelector {
+  padding: $spacing-lg $page-padding;
+  background: $color-bg-card;
+  margin-top: $spacing-xs;
+}
+
+.selectorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.selectorLabel {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  min-width: 120rpx;
+}
+
+.pickerValue {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.pickerArrow {
+  margin-left: $spacing-sm;
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+  transform: rotate(90deg);
+}
+
+.vsDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm 0;
+}
+
+.vsText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  background: $color-bg-primary-light;
+  padding: $spacing-xs $spacing-lg;
+  border-radius: $radius-pill;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-xl;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  margin-top: $spacing-xs;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.legendBox {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: $radius-sm;
+}
+
+.legendAdded {
+  background: $color-success;
+}
+
+.legendRemoved {
+  background: $color-danger;
+}
+
+.legendUnchanged {
+  background: $color-bg-tertiary;
+}
+
+.legendText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.diffContent {
+  flex: 1;
+  padding: $spacing-md $page-padding;
+}
+
+.diffSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-border-light;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionNoChange {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+}
+
+.diffBox {
+  font-size: $font-size-md;
+  line-height: 1.8;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.diffText {
+  font-size: $font-size-md;
+  line-height: 1.8;
+}
+
+.diffAdded {
+  background: rgba(0, 180, 42, 0.15);
+  color: $color-success;
+  border-radius: $radius-xs;
+  padding: 0 4rpx;
+}
+
+.diffRemoved {
+  background: rgba(245, 63, 63, 0.15);
+  color: $color-danger;
+  text-decoration: line-through;
+  border-radius: $radius-xs;
+  padding: 0 4rpx;
+}
+
+.diffUnchanged {
+  color: $color-text-primary;
+}
+
+.emptyText {
+  color: $color-text-tertiary;
+  font-style: italic;
+}
+
+.versionInfo {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+}
+
+.versionDetail {
+  flex: 1;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.versionLabel {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx solid $color-border-light;
+}
+
+.versionText {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 2;
 }

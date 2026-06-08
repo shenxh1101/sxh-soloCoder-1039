@@ -1,12 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Input, Textarea, Button, Image, Switch, Picker } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow, useDidHide } from '@tarojs/taro';
 import classnames from 'classnames';
-import { CreateArticleForm } from '@/types/article';
-import { mockCategories } from '@/data/mockCategories';
+import { CreateArticleForm, Article, ArticleStatus, ArticleVersion } from '@/types/article';
+import { ReviewRecord, ReviewStatus } from '@/types/review';
+import { useAppStore } from '@/store';
 import styles from './index.module.scss';
 
 const EditorPage: React.FC = () => {
+  const { 
+    articles, 
+    categories, 
+    currentEditingArticleId, 
+    setCurrentEditingArticleId,
+    addArticle, 
+    updateArticle,
+    addReview 
+  } = useAppStore();
+
   const [form, setForm] = useState<CreateArticleForm>({
     title: '',
     summary: '',
@@ -18,13 +29,84 @@ const EditorPage: React.FC = () => {
     scheduledPublishTime: ''
   });
   
+  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [enableSchedule, setEnableSchedule] = useState(false);
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
   const [newTag, setNewTag] = useState('');
   const [categoryName, setCategoryName] = useState('请选择栏目');
 
-  const categoryRange = mockCategories.map(c => c.name);
+  const categoryRange = categories.map(c => c.name);
+
+  const loadEditingArticle = useCallback(() => {
+    if (!currentEditingArticleId) {
+      console.log('[Editor] 新建稿件，清空表单');
+      setEditingArticle(null);
+      resetForm();
+      return;
+    }
+
+    const article = articles.find(a => a.id === currentEditingArticleId);
+    if (!article) {
+      console.log('[Editor] 未找到文章:', currentEditingArticleId);
+      setCurrentEditingArticleId(null);
+      resetForm();
+      return;
+    }
+
+    console.log('[Editor] 加载文章:', article.id, article.title);
+    setEditingArticle(article);
+    setForm({
+      title: article.title,
+      summary: article.summary,
+      content: article.content,
+      coverImage: article.coverImage,
+      images: article.images,
+      tags: article.tags,
+      categoryId: article.categoryId,
+      scheduledPublishTime: article.scheduledPublishTime || ''
+    });
+
+    const category = categories.find(c => c.id === article.categoryId);
+    if (category) {
+      setCategoryName(category.name);
+    }
+
+    if (article.scheduledPublishTime) {
+      setEnableSchedule(true);
+      const [date, time] = article.scheduledPublishTime.split(' ');
+      setScheduleDate(date);
+      setScheduleTime(time.slice(0, 5));
+    }
+  }, [currentEditingArticleId, articles, categories, setCurrentEditingArticleId]);
+
+  const resetForm = () => {
+    setForm({
+      title: '',
+      summary: '',
+      content: '',
+      coverImage: '',
+      images: [],
+      tags: [],
+      categoryId: '',
+      scheduledPublishTime: ''
+    });
+    setEditingArticle(null);
+    setEnableSchedule(false);
+    setScheduleDate('');
+    setScheduleTime('');
+    setNewTag('');
+    setCategoryName('请选择栏目');
+  };
+
+  useDidShow(() => {
+    console.log('[Editor] 页面显示');
+    loadEditingArticle();
+  });
+
+  useDidHide(() => {
+    console.log('[Editor] 页面隐藏');
+  });
 
   useEffect(() => {
     console.log('[Editor] 页面初始化');
@@ -125,7 +207,7 @@ const EditorPage: React.FC = () => {
 
   const handleCategoryChange = (e) => {
     const index = parseInt(e.detail.value);
-    const category = mockCategories[index];
+    const category = categories[index];
     setForm(prev => ({ ...prev, categoryId: category.id }));
     setCategoryName(category.name);
     console.log('[Editor] 选择栏目:', category.name);
@@ -162,6 +244,59 @@ const EditorPage: React.FC = () => {
     }
   };
 
+  const createArticleFromForm = (status: ArticleStatus): Article => {
+    const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    const initialVersion: ArticleVersion = {
+      id: `v${Date.now()}`,
+      version: 1,
+      title: form.title,
+      content: form.content,
+      createdAt: now,
+      operator: '当前用户',
+      remark: status === 'draft' ? '创建草稿' : '提交审核'
+    };
+
+    return {
+      id: editingArticle?.id || `a${Date.now()}`,
+      title: form.title,
+      summary: form.summary,
+      content: form.content,
+      coverImage: form.coverImage,
+      images: form.images,
+      tags: form.tags,
+      categoryId: form.categoryId,
+      categoryName: categories.find(c => c.id === form.categoryId)?.name || '',
+      status,
+      author: '当前用户',
+      views: editingArticle?.views || 0,
+      shares: editingArticle?.shares || 0,
+      comments: editingArticle?.comments || 0,
+      scheduledPublishTime: form.scheduledPublishTime,
+      createdAt: editingArticle?.createdAt || now,
+      updatedAt: now,
+      publishedAt: editingArticle?.publishedAt,
+      versions: editingArticle ? [...editingArticle.versions, initialVersion] : [initialVersion],
+      isTop: editingArticle?.isTop || false
+    };
+  };
+
+  const createReviewRecord = (article: Article): ReviewRecord => {
+    const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    return {
+      id: `r${Date.now()}`,
+      articleId: article.id,
+      articleTitle: article.title,
+      articleCover: article.coverImage,
+      submitter: article.author,
+      submitTime: now,
+      version: article.versions.length,
+      status: 'pending' as ReviewStatus,
+      reviewer: undefined,
+      reviewTime: undefined,
+      reviewComment: undefined
+    };
+  };
+
   const handleSaveDraft = () => {
     console.log('[Editor] 保存草稿');
     if (!form.title.trim()) {
@@ -170,11 +305,33 @@ const EditorPage: React.FC = () => {
     }
     
     Taro.showLoading({ title: '保存中...' });
+    
     setTimeout(() => {
-      Taro.hideLoading();
-      Taro.showToast({ title: '草稿已保存', icon: 'success' });
-      console.log('[Editor] 草稿保存成功', form);
-    }, 1000);
+      try {
+        const article = createArticleFromForm('draft');
+        
+        if (editingArticle) {
+          console.log('[Editor] 更新现有草稿:', article.id);
+          updateArticle(article.id, article);
+        } else {
+          console.log('[Editor] 创建新草稿:', article.id);
+          addArticle(article);
+        }
+        
+        Taro.hideLoading();
+        Taro.showToast({ title: '草稿已保存', icon: 'success' });
+        console.log('[Editor] 草稿保存成功', article);
+        
+        setTimeout(() => {
+          setCurrentEditingArticleId(null);
+          Taro.switchTab({ url: '/pages/article-list/index' });
+        }, 1000);
+      } catch (error) {
+        console.error('[Editor] 保存失败:', error);
+        Taro.hideLoading();
+        Taro.showToast({ title: '保存失败，请重试', icon: 'none' });
+      }
+    }, 500);
   };
 
   const handleSubmitReview = () => {
@@ -206,14 +363,36 @@ const EditorPage: React.FC = () => {
       success: (res) => {
         if (res.confirm) {
           Taro.showLoading({ title: '提交中...' });
+          
           setTimeout(() => {
-            Taro.hideLoading();
-            Taro.showToast({ title: '已提交审核', icon: 'success' });
-            console.log('[Editor] 已提交审核', form);
-            setTimeout(() => {
-              Taro.switchTab({ url: '/pages/review/index' });
-            }, 1500);
-          }, 1000);
+            try {
+              const article = createArticleFromForm('pending');
+              
+              if (editingArticle) {
+                console.log('[Editor] 更新文章并提交审核:', article.id);
+                updateArticle(article.id, article);
+              } else {
+                console.log('[Editor] 创建新文章并提交审核:', article.id);
+                addArticle(article);
+              }
+              
+              const review = createReviewRecord(article);
+              addReview(review);
+              
+              Taro.hideLoading();
+              Taro.showToast({ title: '已提交审核', icon: 'success' });
+              console.log('[Editor] 已提交审核', article, review);
+              
+              setTimeout(() => {
+                setCurrentEditingArticleId(null);
+                Taro.switchTab({ url: '/pages/review/index' });
+              }, 1500);
+            } catch (error) {
+              console.error('[Editor] 提交失败:', error);
+              Taro.hideLoading();
+              Taro.showToast({ title: '提交失败，请重试', icon: 'none' });
+            }
+          }, 500);
         }
       }
     });
