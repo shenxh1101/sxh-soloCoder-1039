@@ -1,0 +1,84 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  flex: 1;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  min-width: 0;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+  
+  &.primary {
+    .value { color: $color-primary; }
+  }
+  
+  &.success {
+    .value { color: $color-success; }
+    .trend.up { color: $color-success; }
+  }
+  
+  &.warning {
+    .value { color: $color-warning; }
+    .trend.up { color: $color-warning; }
+  }
+  
+  &.error {
+    .value { color: $color-error; }
+    .trend.down { color: $color-error; }
+  }
+}
+
+.title {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: $spacing-xs;
+}
+
+.value {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.unit {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: $spacing-xs;
+}
+
+.trend {
+  display: flex;
+  align-items: center;
+  
+  &.up {
+    color: $color-success;
+  }
+  
+  &.down {
+    color: $color-error;
+  }
+}
+
+.trendIcon {
+  font-size: $font-size-sm;
+  margin-right: 4rpx;
+}
+
+.trendText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}

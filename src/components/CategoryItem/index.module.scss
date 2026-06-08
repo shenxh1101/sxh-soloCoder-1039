@@ -1,0 +1,158 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.sortNum {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-primary-gradient;
+  color: $color-text-white;
+  border-radius: $radius-round;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.recommendTag {
+  padding: $spacing-xs $spacing-sm;
+  background: rgba(255, 125, 0, 0.1);
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.recommendText {
+  font-size: 20rpx;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
+
+.articleCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.description {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.topInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+}
+
+.topLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.topCount {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  @include button-reset;
+  height: $button-height-sm;
+  padding: 0 $spacing-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  
+  &.disabled {
+    opacity: 0.4;
+  }
+}
+
+.sortBtn {
+  width: 64rpx;
+  height: 64rpx;
+  padding: 0;
+  background: $color-bg-hover;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+}
+
+.actionIcon {
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+}
+
+.recommendBtn {
+  flex: 1;
+  background: $color-bg-hover;
+  border: 1px solid $color-border;
+  color: $color-text-secondary;
+  
+  &.active {
+    background: rgba(255, 125, 0, 0.1);
+    border-color: $color-warning;
+    
+    .actionText {
+      color: $color-warning;
+    }
+  }
+}
+
+.actionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}

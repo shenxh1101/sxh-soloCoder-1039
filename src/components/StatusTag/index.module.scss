@@ -1,0 +1,65 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacing-sm;
+  height: 40rpx;
+  border-radius: $radius-sm;
+  
+  .text {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+  }
+  
+  &.sm {
+    height: 32rpx;
+    padding: 0 $spacing-xs;
+    
+    .text {
+      font-size: 20rpx;
+    }
+  }
+  
+  &.draft {
+    background-color: $color-bg-tag-draft;
+    .text { color: $color-draft; }
+  }
+  
+  &.pending {
+    background-color: $color-bg-tag-pending;
+    .text { color: $color-pending; }
+  }
+  
+  &.published {
+    background-color: $color-bg-tag-published;
+    .text { color: $color-published; }
+  }
+  
+  &.approved {
+    background-color: $color-bg-tag-published;
+    .text { color: $color-published; }
+  }
+  
+  &.rejected {
+    background-color: $color-bg-tag-rejected;
+    .text { color: $color-text-white; }
+  }
+  
+  &.offline {
+    background-color: $color-bg-tag-rejected;
+    .text { color: $color-text-white; }
+  }
+  
+  &.failed {
+    background-color: $color-bg-tag-rejected;
+    .text { color: $color-text-white; }
+  }
+  
+  &.default {
+    background-color: $color-bg-hover;
+    .text { color: $color-text-secondary; }
+  }
+}

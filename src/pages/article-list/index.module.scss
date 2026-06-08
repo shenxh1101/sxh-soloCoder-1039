@@ -1,0 +1,140 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: $color-bg-page;
+  padding: $spacing-lg $page-padding $spacing-md;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-button;
+  padding: 0 $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.searchIcon {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.filterTabs {
+  display: flex;
+  gap: $spacing-sm;
+  @include scroll-x-container;
+}
+
+.filterTab {
+  @include scroll-x-item(auto);
+  height: 56rpx;
+  padding: 0 $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+  
+  &.active {
+    background: $color-primary-gradient;
+    
+    .tabText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.tabText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.count {
+  margin-left: $spacing-xs;
+  font-size: 20rpx;
+  opacity: 0.8;
+}
+
+.listContainer {
+  padding: 0 $page-padding;
+}
+
+.list {
+  padding-top: $spacing-md;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+  opacity: 0.3;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.fab {
+  @include button-reset;
+  position: fixed;
+  right: $spacing-lg;
+  bottom: 180rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background: $color-primary-gradient;
+  box-shadow: $shadow-float;
+  z-index: 100;
+  transition: all $transition-base;
+  
+  &:active {
+    transform: scale(0.95);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.fabIcon {
+  font-size: 60rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-lg;
+}
+
+.loadingText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

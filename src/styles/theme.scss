@@ -1,0 +1,43 @@
+// ============================================
+// 主题配色变量（第二阶段模型可修改此文件）
+// ============================================
+
+// 品牌主题色：专业商务蓝
+$color-primary: #165DFF;
+$color-primary-light: #4080FF;
+$color-primary-dark: #0E42D2;
+$color-primary-gradient: linear-gradient(135deg, #165DFF 0%, #4080FF 100%);
+
+// 功能色
+$color-success: #00B42A;
+$color-success-light: #0FC6C2;
+$color-warning: #FF7D00;
+$color-warning-light: #FF9A2E;
+$color-error: #F53F3F;
+$color-info: #165DFF;
+
+// 背景色
+$color-bg-page: #F7F8FA;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #F2F3F5;
+$color-bg-tag-draft: #FFF7E8;
+$color-bg-tag-published: #E8FFEA;
+$color-bg-tag-pending: #FFF1E0;
+$color-bg-tag-rejected: #FFECE8;
+
+// 文本色
+$color-text-primary: #1D2129;
+$color-text-secondary: #4E5969;
+$color-text-tertiary: #86909C;
+$color-text-disabled: #C9CDD4;
+$color-text-white: #FFFFFF;
+
+// 边框色
+$color-border: #E5E6EB;
+$color-divider: #F2F3F5;
+
+// 业务色
+$color-draft: #FF7D00;
+$color-published: #00B42A;
+$color-pending: #FF7D00;
+$color-rejected: #F53F3F;

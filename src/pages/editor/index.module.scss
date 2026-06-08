@@ -1,0 +1,379 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 140rpx;
+  background-color: $color-bg-page;
+}
+
+.form {
+  padding: $spacing-md $page-padding;
+}
+
+.section {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  
+  &::before {
+    content: '';
+    width: 6rpx;
+    height: 32rpx;
+    background: $color-primary-gradient;
+    border-radius: 3rpx;
+    margin-right: $spacing-sm;
+  }
+}
+
+.titleInput {
+  width: 100%;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: 1.4;
+  padding: $spacing-md 0;
+}
+
+.titleCount {
+  text-align: right;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.textarea {
+  width: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-normal;
+  min-height: 200rpx;
+  padding: $spacing-sm 0;
+}
+
+.summaryTextarea {
+  @extend .textarea;
+  min-height: 150rpx;
+}
+
+.contentTextarea {
+  @extend .textarea;
+  min-height: 400rpx;
+}
+
+.countInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.coverSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.coverPreview {
+  position: relative;
+  width: 100%;
+  height: 300rpx;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $color-bg-hover;
+  border: 2rpx dashed $color-border;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+}
+
+.coverPlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.coverIcon {
+  font-size: 64rpx;
+  margin-bottom: $spacing-sm;
+  opacity: 0.4;
+}
+
+.coverText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.coverChange {
+  position: absolute;
+  bottom: $spacing-sm;
+  right: $spacing-sm;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: $radius-button;
+}
+
+.coverChangeText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+}
+
+.imagesSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.imagesList {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.imageItem {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $color-bg-hover;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.imageDelete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(245, 63, 63, 0.9);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageDeleteText {
+  font-size: 28rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.addImageBtn {
+  @include button-reset;
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed $color-border;
+  border-radius: $radius-md;
+  background-color: $color-bg-card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.8;
+    background-color: $color-bg-hover;
+  }
+}
+
+.addImageIcon {
+  font-size: 48rpx;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-xs;
+}
+
+.addImageText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.tagsSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.tagItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-md;
+  background-color: rgba(22, 93, 255, 0.1);
+  border-radius: $radius-button;
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin-right: $spacing-xs;
+}
+
+.tagDelete {
+  font-size: 28rpx;
+  color: $color-primary;
+  opacity: 0.6;
+}
+
+.tagInputRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.tagInput {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+}
+
+.addTagBtn {
+  @include button-reset;
+  height: 72rpx;
+  padding: 0 $spacing-lg;
+  background: $color-primary-gradient;
+  border-radius: $radius-button;
+}
+
+.addTagText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.selectRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.selectLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.selectValue {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+}
+
+.selectArrow {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  margin-left: $spacing-xs;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+}
+
+.switchLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.dateInput {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  text-align: right;
+  padding: $spacing-md 0;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.btn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.btnSecondary {
+  background-color: $color-bg-hover;
+  border: 1px solid $color-border;
+}
+
+.btnPrimary {
+  background: $color-primary-gradient;
+}
+
+.btnText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.btnTextPrimary {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.hint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+}

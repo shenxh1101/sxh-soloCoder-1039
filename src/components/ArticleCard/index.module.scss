@@ -1,0 +1,141 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  flex-direction: row;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.99);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.leftContent {
+  flex: 1;
+  margin-right: $spacing-md;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+  gap: $spacing-xs;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacing-xs;
+  height: 32rpx;
+  border-radius: $radius-xs;
+}
+
+.tagText {
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.topTag {
+  background-color: rgba(22, 93, 255, 0.1);
+  .tagText { color: $color-primary; }
+}
+
+.recommendTag {
+  background-color: rgba(255, 125, 0, 0.1);
+  .tagText { color: $color-warning; }
+}
+
+.title {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis-multi(2);
+}
+
+.summary {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.metaItem {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.metaDot {
+  margin: 0 $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+}
+
+.statIcon {
+  font-size: $font-size-sm;
+  margin-right: $spacing-xs;
+  color: $color-text-tertiary;
+}
+
+.statText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.tagItem {
+  padding: $spacing-xs $spacing-sm;
+  background-color: $color-bg-hover;
+  border-radius: $radius-xs;
+}
+
+.tagItemText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.cover {
+  width: 200rpx;
+  height: 150rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+  background-color: $color-bg-hover;
+}
