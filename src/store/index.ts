@@ -27,6 +27,7 @@ interface AppState {
   addReview: (review: ReviewRecord) => void;
   updateReview: (id: string, updates: Partial<ReviewRecord>) => void;
   resubmitReview: (id: string) => void;
+  submitArticleForReview: (article: Article, review: ReviewRecord) => void;
   
   updateCategory: (id: string, updates: Partial<Category>) => void;
   moveCategory: (id: string, direction: 'up' | 'down') => void;
@@ -138,6 +139,8 @@ export const useAppStore = create<AppState>()(
         if (!review) return;
 
         const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        const currentArticle = get().articles.find(a => a.id === review.articleId);
+        
         const newReview: ReviewRecord = {
           ...review,
           id: `r${Date.now()}`,
@@ -162,8 +165,9 @@ export const useAppStore = create<AppState>()(
                     {
                       id: `v${Date.now()}`,
                       version: review.version + 1,
-                      title: a.title,
-                      content: a.content,
+                      title: currentArticle?.title || a.title,
+                      summary: currentArticle?.summary || a.summary,
+                      content: currentArticle?.content || a.content,
                       createdAt: now,
                       operator: a.author,
                       remark: '根据审核意见修改后重新提交'
@@ -249,6 +253,83 @@ export const useAppStore = create<AppState>()(
       setCurrentTopPanelCategoryId: (id) => {
         console.log('[Store] 设置当前置顶面板栏目ID:', id);
         set({ currentTopPanelCategoryId: id });
+      },
+
+      submitArticleForReview: (article, review) => {
+        console.log('[Store] 提交文章审核:', article.id, article.title);
+        const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        
+        const existingReviewIndex = get().reviews.findIndex(
+          r => r.articleId === article.id
+        );
+
+        const newReview: ReviewRecord = {
+          ...review,
+          id: existingReviewIndex >= 0 ? get().reviews[existingReviewIndex].id : `r${Date.now()}`,
+          articleId: article.id,
+          articleTitle: article.title,
+          articleCover: article.coverImage,
+          submitter: article.author,
+          submitTime: now,
+          version: article.versions.length,
+          status: 'pending' as ReviewStatus,
+          reviewer: undefined,
+          reviewTime: undefined,
+          reviewComment: undefined
+        };
+
+        set(state => {
+          let newReviews;
+          if (existingReviewIndex >= 0) {
+            console.log('[Store] 更新已有审核记录为待审核');
+            newReviews = state.reviews.map(r =>
+              r.articleId === article.id ? newReview : r
+            );
+          } else {
+            console.log('[Store] 创建新的审核记录');
+            newReviews = [newReview, ...state.reviews];
+          }
+
+          const existingArticleIndex = state.articles.findIndex(a => a.id === article.id);
+          let newArticles;
+          if (existingArticleIndex >= 0) {
+            newArticles = state.articles.map(a =>
+              a.id === article.id
+                ? {
+                    ...article,
+                    status: 'pending' as ArticleStatus,
+                    updatedAt: now
+                  }
+                : a
+            );
+          } else {
+            newArticles = [{ ...article, status: 'pending' as ArticleStatus }, ...state.articles];
+          }
+
+          const existingUnpublishedIndex = state.unpublishedArticles.findIndex(
+            u => u.id === article.id
+          );
+          let newUnpublished;
+          const unpublishedItem = {
+            id: article.id,
+            title: article.title,
+            status: 'pending' as const,
+            updatedAt: now
+          };
+          if (existingUnpublishedIndex >= 0) {
+            newUnpublished = state.unpublishedArticles.map(u =>
+              u.id === article.id ? unpublishedItem : u
+            );
+          } else {
+            newUnpublished = [unpublishedItem, ...state.unpublishedArticles];
+          }
+
+          return {
+            articles: newArticles,
+            reviews: newReviews,
+            unpublishedArticles: newUnpublished
+          };
+        });
       },
 
       resetToMock: () => {

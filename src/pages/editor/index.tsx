@@ -15,7 +15,7 @@ const EditorPage: React.FC = () => {
     setCurrentEditingArticleId,
     addArticle, 
     updateArticle,
-    addReview 
+    submitArticleForReview
   } = useAppStore();
 
   const [form, setForm] = useState<CreateArticleForm>({
@@ -248,12 +248,13 @@ const EditorPage: React.FC = () => {
     const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
     const initialVersion: ArticleVersion = {
       id: `v${Date.now()}`,
-      version: 1,
+      version: (editingArticle?.versions.length || 0) + 1,
       title: form.title,
+      summary: form.summary,
       content: form.content,
       createdAt: now,
       operator: '当前用户',
-      remark: status === 'draft' ? '创建草稿' : '提交审核'
+      remark: status === 'draft' ? '保存草稿' : '提交审核'
     };
 
     return {
@@ -367,21 +368,14 @@ const EditorPage: React.FC = () => {
           setTimeout(() => {
             try {
               const article = createArticleFromForm('pending');
-              
-              if (editingArticle) {
-                console.log('[Editor] 更新文章并提交审核:', article.id);
-                updateArticle(article.id, article);
-              } else {
-                console.log('[Editor] 创建新文章并提交审核:', article.id);
-                addArticle(article);
-              }
-              
               const review = createReviewRecord(article);
-              addReview(review);
+              
+              console.log('[Editor] 提交审核:', article.id, article.title);
+              submitArticleForReview(article, review);
               
               Taro.hideLoading();
               Taro.showToast({ title: '已提交审核', icon: 'success' });
-              console.log('[Editor] 已提交审核', article, review);
+              console.log('[Editor] 已提交审核', article);
               
               setTimeout(() => {
                 setCurrentEditingArticleId(null);

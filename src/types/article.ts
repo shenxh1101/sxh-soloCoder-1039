@@ -28,6 +28,7 @@ export interface ArticleVersion {
   id: string;
   version: number;
   title: string;
+  summary: string;
   content: string;
   createdAt: string;
   operator: string;

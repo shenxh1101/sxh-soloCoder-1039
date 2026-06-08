@@ -118,6 +118,7 @@
   padding: $spacing-md $page-padding;
   background: $color-bg-card;
   margin-top: $spacing-xs;
+  flex-wrap: wrap;
 }
 
 .legendItem {
@@ -138,6 +139,10 @@
 
 .legendRemoved {
   background: $color-danger;
+}
+
+.legendModified {
+  background: $color-warning;
 }
 
 .legendUnchanged {
@@ -189,9 +194,11 @@
   border-radius: $radius-md;
 }
 
-.diffText {
+.diffUnchanged {
   font-size: $font-size-md;
   line-height: 1.8;
+  color: $color-text-primary;
+  white-space: pre-wrap;
 }
 
 .diffAdded {
@@ -199,6 +206,9 @@
   color: $color-success;
   border-radius: $radius-xs;
   padding: 0 4rpx;
+  white-space: pre-wrap;
+  font-size: $font-size-md;
+  line-height: 1.8;
 }
 
 .diffRemoved {
@@ -207,10 +217,117 @@
   text-decoration: line-through;
   border-radius: $radius-xs;
   padding: 0 4rpx;
+  white-space: pre-wrap;
+  font-size: $font-size-md;
+  line-height: 1.8;
 }
 
-.diffUnchanged {
-  color: $color-text-primary;
+.modifiedInline {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin: $spacing-xs 0;
+}
+
+.modifiedOldRow,
+.modifiedNewRow {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+}
+
+.modifiedLabel {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: $radius-sm;
+  color: $color-text-inverse;
+  margin-top: 4rpx;
+}
+
+.modifiedOldRow .modifiedLabel {
+  background: $color-danger;
+}
+
+.modifiedNewRow .modifiedLabel {
+  background: $color-success;
+}
+
+.modifiedBlock {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin: $spacing-sm 0;
+}
+
+.modifiedOld,
+.modifiedNew {
+  padding: $spacing-md;
+  border-radius: $radius-md;
+}
+
+.modifiedOld {
+  background: rgba(245, 63, 63, 0.08);
+  border-left: 4rpx solid $color-danger;
+}
+
+.modifiedNew {
+  background: rgba(0, 180, 42, 0.08);
+  border-left: 4rpx solid $color-success;
+}
+
+.blockLabel {
+  display: block;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-sm;
+}
+
+.modifiedOld .blockLabel {
+  color: $color-danger;
+}
+
+.modifiedNew .blockLabel {
+  color: $color-success;
+}
+
+.unchangedBlock {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  padding: $spacing-sm 0;
+  white-space: pre-wrap;
+}
+
+.modifiedSection {
+  margin: $spacing-md 0;
+  background: rgba(255, 125, 0, 0.05);
+  border: 1rpx solid rgba(255, 125, 0, 0.3);
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+}
+
+.sectionBadge {
+  display: inline-block;
+  background: $color-warning;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+  margin-bottom: $spacing-sm;
+}
+
+.badgeText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-inverse;
+}
+
+.modifiedContent {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
 }
 
 .emptyText {
@@ -222,6 +339,7 @@
   display: flex;
   gap: $spacing-lg;
   margin-top: $spacing-lg;
+  flex-direction: column;
 }
 
 .versionDetail {
@@ -246,4 +364,10 @@
   font-size: $font-size-sm;
   color: $color-text-secondary;
   line-height: 2;
+}
+
+@media (min-width: 750px) {
+  .versionInfo {
+    flex-direction: row;
+  }
 }

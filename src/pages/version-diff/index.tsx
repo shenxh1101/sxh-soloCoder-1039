@@ -3,12 +3,21 @@ import { View, Text, ScrollView, Picker } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import { useAppStore } from '@/store';
-import { Article, ArticleVersion } from '@/types/article';
+import { ArticleVersion } from '@/types/article';
 import styles from './index.module.scss';
 
+type DiffType = 'unchanged' | 'added' | 'removed' | 'modified';
+
 interface DiffSegment {
-  type: 'unchanged' | 'added' | 'removed';
-  content: string;
+  type: DiffType;
+  oldContent: string;
+  newContent: string;
+}
+
+interface DiffBlock {
+  type: DiffType;
+  segments: DiffSegment[];
+  label?: string;
 }
 
 const VersionDiffPage: React.FC = () => {
@@ -42,17 +51,34 @@ const VersionDiffPage: React.FC = () => {
   }
 
   const versions = article.versions;
+  const versionCount = versions.length;
 
-  if (versions.length < 2) {
+  if (versionCount === 0) {
     return (
       <View className={styles.page}>
         <View className={styles.emptyState}>
           <Text className={styles.emptyIcon}>📊</Text>
           <Text className={styles.emptyTitle}>暂无历史版本</Text>
           <Text className={styles.emptyDesc}>
-            该文章目前只有 1 个版本，无法进行版本对比。
+            该文章还没有保存过历史版本。
             {"\n"}
-            当文章有多个版本时，您可以在此处查看不同版本的差异。
+            保存草稿或提交审核后会自动生成版本记录。
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (versionCount === 1) {
+    return (
+      <View className={styles.page}>
+        <View className={styles.emptyState}>
+          <Text className={styles.emptyIcon}>📊</Text>
+          <Text className={styles.emptyTitle}>暂时无法对比</Text>
+          <Text className={styles.emptyDesc}>
+            该文章目前只有 {versionCount} 个版本，无法进行版本对比。
+            {"\n"}
+            当文章有 2 个及以上版本时，您可以在此处查看不同版本的差异。
           </Text>
         </View>
       </View>
@@ -61,74 +87,172 @@ const VersionDiffPage: React.FC = () => {
 
   const versionOptions = versions.map((v, i) => `版本 ${v.version} (${v.createdAt.slice(5, 16)})`);
 
-  const computeDiff = (oldText: string, newText: string): DiffSegment[] => {
+  const findCommonSubstrings = (s1: string, s2: string): string[] => {
+    const common: string[] = [];
+    const minLen = Math.min(s1.length, s2.length);
+    
+    let i = 0;
+    while (i < minLen) {
+      let maxLen = 0;
+      let maxI = i;
+      let maxJ = 0;
+      
+      for (let j = 0; j < s2.length; j++) {
+        let len = 0;
+        while (i + len < s1.length && j + len < s2.length && s1[i + len] === s2[j + len]) {
+          len++;
+        }
+        if (len > maxLen) {
+          maxLen = len;
+          maxI = i;
+          maxJ = j;
+        }
+      }
+      
+      if (maxLen >= 2) {
+        if (maxI > i) {
+          common.push('');
+        }
+        common.push(s1.substr(maxI, maxLen));
+        i = maxI + maxLen;
+      } else {
+        i++;
+      }
+    }
+    
+    return common.filter(s => s.length > 0);
+  };
+
+  const computeSmartDiff = (oldText: string, newText: string): DiffSegment[] => {
     if (!oldText && !newText) return [];
-    if (!oldText) return [{ type: 'added', content: newText }];
-    if (!newText) return [{ type: 'removed', content: oldText }];
+    if (!oldText) return [{ type: 'added', oldContent: '', newContent: newText }];
+    if (!newText) return [{ type: 'removed', oldContent: oldText, newContent: '' }];
+    if (oldText === newText) return [{ type: 'unchanged', oldContent, newContent }];
 
-    const oldChars = oldText.split('');
-    const newChars = newText.split('');
+    const commonParts = findCommonSubstrings(oldText, newText);
     
-    const maxLen = Math.max(oldChars.length, newChars.length);
-    const minLen = Math.min(oldChars.length, newChars.length);
-    
-    const result: DiffSegment[] = [];
-    let currentSegment: DiffSegment | null = null;
+    if (commonParts.length === 0) {
+      return [
+        { type: 'removed', oldContent: oldText, newContent: '' },
+        { type: 'added', oldContent: '', newContent: newText }
+      ];
+    }
 
-    const flushSegment = () => {
-      if (currentSegment) {
-        result.push(currentSegment);
-        currentSegment = null;
+    const segments: DiffSegment[] = [];
+    let oldPos = 0;
+    let newPos = 0;
+    let commonIndex = 0;
+
+    const addModifiedSegment = (oldPart: string, newPart: string) => {
+      if (oldPart || newPart) {
+        segments.push({
+          type: 'modified',
+          oldContent: oldPart,
+          newContent: newPart
+        });
       }
     };
 
-    for (let i = 0; i < maxLen; i++) {
-      const oldChar = oldChars[i];
-      const newChar = newChars[i];
+    while (commonIndex < commonParts.length) {
+      const common = commonParts[commonIndex];
+      const oldCommonPos = oldText.indexOf(common, oldPos);
+      const newCommonPos = newText.indexOf(common, newPos);
 
-      if (i < minLen && oldChar === newChar) {
-        if (!currentSegment || currentSegment.type !== 'unchanged') {
-          flushSegment();
-          currentSegment = { type: 'unchanged', content: '' };
-        }
-        currentSegment.content += oldChar;
-      } else {
-        if (oldChar !== undefined) {
-          if (!currentSegment || currentSegment.type !== 'removed') {
-            flushSegment();
-            currentSegment = { type: 'removed', content: '' };
-          }
-          currentSegment.content += oldChar;
-        }
-        if (newChar !== undefined && oldChar !== newChar) {
-          if (i >= minLen || oldChar === undefined) {
-            if (!currentSegment || currentSegment.type !== 'added') {
-              flushSegment();
-              currentSegment = { type: 'added', content: '' };
-            }
-            currentSegment.content += newChar;
-          }
-        }
+      if (oldCommonPos > oldPos || newCommonPos > newPos) {
+        const oldDiff = oldText.substring(oldPos, oldCommonPos);
+        const newDiff = newText.substring(newPos, newCommonPos);
+        addModifiedSegment(oldDiff, newDiff);
       }
+
+      segments.push({
+        type: 'unchanged',
+        oldContent: common,
+        newContent: common
+      });
+
+      oldPos = oldCommonPos + common.length;
+      newPos = newCommonPos + common.length;
+      commonIndex++;
     }
 
-    flushSegment();
-    return result;
+    if (oldPos < oldText.length || newPos < newText.length) {
+      const oldDiff = oldText.substring(oldPos);
+      const newDiff = newText.substring(newPos);
+      addModifiedSegment(oldDiff, newDiff);
+    }
+
+    return segments;
+  };
+
+  const splitIntoBlocks = (oldText: string, newText: string): DiffBlock[] => {
+    const oldLines = oldText.split('\n');
+    const newLines = newText.split('\n');
+    const blocks: DiffBlock[] = [];
+    
+    const maxLines = Math.max(oldLines.length, newLines.length);
+    
+    let i = 0;
+    while (i < maxLines) {
+      const oldLine = oldLines[i] || '';
+      const newLine = newLines[i] || '';
+      
+      if (oldLine === newLine) {
+        const unchangedSegments: DiffSegment[] = [];
+        while (i < maxLines && oldLines[i] === newLines[i]) {
+          unchangedSegments.push({
+            type: 'unchanged',
+            oldContent: oldLines[i] || '',
+            newContent: newLines[i] || ''
+          });
+          i++;
+        }
+        blocks.push({ type: 'unchanged', segments: unchangedSegments });
+      } else {
+        const modifiedSegments: DiffSegment[] = [];
+        let blockOld = '';
+        let blockNew = '';
+        
+        while (i < maxLines && oldLines[i] !== newLines[i]) {
+          if (blockOld) blockOld += '\n';
+          if (blockNew) blockNew += '\n';
+          blockOld += oldLines[i] || '';
+          blockNew += newLines[i] || '';
+          i++;
+        }
+        
+        const segments = computeSmartDiff(blockOld, blockNew);
+        blocks.push({ 
+          type: 'modified', 
+          segments,
+          label: '修改段落'
+        });
+      }
+    }
+    
+    return blocks;
   };
 
   const oldVersion = versions[oldVersionIndex];
   const newVersion = versions[newVersionIndex];
 
-  const titleDiff = computeDiff(oldVersion.title || '', newVersion.title || '');
-  const contentDiff = computeDiff(oldVersion.content || '', newVersion.content || '');
+  const titleDiff = useMemo(() => 
+    computeSmartDiff(oldVersion.title || '', newVersion.title || ''),
+    [oldVersion, newVersion]
+  );
   
-  const oldSummary = article.summary;
-  const newSummary = article.summary;
-  const summaryDiff = computeDiff(oldSummary, newSummary);
+  const summaryDiff = useMemo(() => 
+    computeSmartDiff(oldVersion.summary || '', newVersion.summary || ''),
+    [oldVersion, newVersion]
+  );
+  
+  const contentBlocks = useMemo(() => 
+    splitIntoBlocks(oldVersion.content || '', newVersion.content || ''),
+    [oldVersion, newVersion]
+  );
 
   const hasTitleChanges = titleDiff.some(s => s.type !== 'unchanged');
   const hasSummaryChanges = summaryDiff.some(s => s.type !== 'unchanged');
-  const hasContentChanges = contentDiff.some(s => s.type !== 'unchanged');
+  const hasContentChanges = contentBlocks.some(b => b.type !== 'unchanged');
 
   const handleOldVersionChange = (e) => {
     const index = parseInt(e.detail.value);
@@ -148,27 +272,113 @@ const VersionDiffPage: React.FC = () => {
     }
   };
 
-  const renderDiffSegments = (segments: DiffSegment[]) => {
-    return segments.map((segment, index) => (
-      <Text
-        key={index}
-        className={classnames({
-          [styles.diffText]: true,
-          [styles.diffAdded]: segment.type === 'added',
-          [styles.diffRemoved]: segment.type === 'removed',
-          [styles.diffUnchanged]: segment.type === 'unchanged'
-        })}
-      >
-        {segment.content}
-      </Text>
-    ));
+  const renderDiffSegments = (segments: DiffSegment[], showInline: boolean = true) => {
+    return segments.map((segment, index) => {
+      if (segment.type === 'unchanged') {
+        return (
+          <Text key={index} className={styles.diffUnchanged}>
+            {segment.newContent}
+          </Text>
+        );
+      }
+      
+      if (segment.type === 'removed') {
+        return (
+          <Text key={index} className={styles.diffRemoved}>
+            {segment.oldContent}
+          </Text>
+        );
+      }
+      
+      if (segment.type === 'added') {
+        return (
+          <Text key={index} className={styles.diffAdded}>
+            {segment.newContent}
+          </Text>
+        );
+      }
+      
+      if (segment.type === 'modified') {
+        if (showInline) {
+          return (
+            <View key={index} className={styles.modifiedInline}>
+              {segment.oldContent && (
+                <View className={styles.modifiedOldRow}>
+                  <Text className={styles.modifiedLabel}>旧</Text>
+                  <Text className={styles.diffRemoved}>{segment.oldContent}</Text>
+                </View>
+              )}
+              {segment.newContent && (
+                <View className={styles.modifiedNewRow}>
+                  <Text className={styles.modifiedLabel}>新</Text>
+                  <Text className={styles.diffAdded}>{segment.newContent}</Text>
+                </View>
+              )}
+            </View>
+          );
+        } else {
+          return (
+            <View key={index} className={styles.modifiedBlock}>
+              {segment.oldContent && (
+                <View className={styles.modifiedOld}>
+                  <Text className={styles.blockLabel}>删除内容</Text>
+                  <Text className={styles.diffRemoved}>{segment.oldContent}</Text>
+                </View>
+              )}
+              {segment.newContent && (
+                <View className={styles.modifiedNew}>
+                  <Text className={styles.blockLabel}>新增内容</Text>
+                  <Text className={styles.diffAdded}>{segment.newContent}</Text>
+                </View>
+              )}
+            </View>
+          );
+        }
+      }
+      
+      return null;
+    });
+  };
+
+  const renderContentBlocks = () => {
+    return contentBlocks.map((block, blockIndex) => {
+      if (block.type === 'unchanged') {
+        return (
+          <View key={blockIndex} className={styles.unchangedBlock}>
+            {block.segments.map((seg, segIndex) => (
+              <Text key={segIndex} className={styles.diffUnchanged}>
+                {seg.newContent}
+                {segIndex < block.segments.length - 1 ? '\n' : ''}
+              </Text>
+            ))}
+          </View>
+        );
+      }
+      
+      if (block.type === 'modified') {
+        return (
+          <View key={blockIndex} className={styles.modifiedSection}>
+            {block.label && (
+              <View className={styles.sectionBadge}>
+                <Text className={styles.badgeText}>{block.label}</Text>
+              </View>
+            )}
+            <View className={styles.modifiedContent}>
+              {renderDiffSegments(block.segments, false)}
+            </View>
+          </View>
+        );
+      }
+      
+      return null;
+    });
   };
 
   return (
     <View className={styles.page}>
       <View className={styles.articleInfo}>
         <Text className={styles.articleTitle}>{article.title}</Text>
-        <Text className={styles.articleMeta}>共 {versions.length} 个版本</Text>
+        <Text className={styles.articleMeta}>共 {versionCount} 个历史版本</Text>
       </View>
 
       <View className={styles.versionSelector}>
@@ -215,6 +425,10 @@ const VersionDiffPage: React.FC = () => {
           <Text className={styles.legendText}>删除</Text>
         </View>
         <View className={styles.legendItem}>
+          <View className={classnames(styles.legendBox, styles.legendModified)} />
+          <Text className={styles.legendText}>修改</Text>
+        </View>
+        <View className={styles.legendItem}>
           <View className={classnames(styles.legendBox, styles.legendUnchanged)} />
           <Text className={styles.legendText}>未变化</Text>
         </View>
@@ -227,7 +441,7 @@ const VersionDiffPage: React.FC = () => {
             {!hasTitleChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
           </View>
           <View className={styles.diffBox}>
-            {renderDiffSegments(titleDiff)}
+            {renderDiffSegments(titleDiff, true)}
           </View>
         </View>
 
@@ -237,7 +451,10 @@ const VersionDiffPage: React.FC = () => {
             {!hasSummaryChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
           </View>
           <View className={styles.diffBox}>
-            {oldSummary ? renderDiffSegments(summaryDiff) : <Text className={styles.emptyText}>无摘要</Text>}
+            {(oldVersion.summary || newVersion.summary) 
+              ? renderDiffSegments(summaryDiff, true)
+              : <Text className={styles.emptyText}>无摘要</Text>
+            }
           </View>
         </View>
 
@@ -247,7 +464,7 @@ const VersionDiffPage: React.FC = () => {
             {!hasContentChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
           </View>
           <View className={styles.diffBox}>
-            {renderDiffSegments(contentDiff)}
+            {renderContentBlocks()}
           </View>
         </View>
 
