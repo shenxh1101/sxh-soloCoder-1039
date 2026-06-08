@@ -111,6 +111,111 @@
   border-radius: $radius-pill;
 }
 
+.overviewSection {
+  background: $color-bg-card;
+  margin-top: $spacing-xs;
+  padding: $spacing-lg $page-padding;
+}
+
+.overviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.overviewTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.overviewActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.filterBtn {
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-pill;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after { border: none; }
+}
+
+.filterBtnActive {
+  background: $color-primary;
+
+  .filterBtnText {
+    color: $color-text-inverse;
+  }
+}
+
+.filterBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.overviewCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.overviewList {
+  display: flex;
+  white-space: nowrap;
+}
+
+.overviewItem {
+  display: inline-flex;
+  align-items: center;
+  height: 64rpx;
+  padding: 0 $spacing-md;
+  margin-right: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+
+  &::after { border: none; }
+}
+
+.overviewItemChanged {
+  background: $color-bg-primary-light;
+  border: 1rpx solid $color-primary;
+}
+
+.overviewItemUnchanged {
+  opacity: 0.6;
+}
+
+.overviewDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-pill;
+  background: $color-text-tertiary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.overviewItemChanged .overviewDot {
+  background: $color-primary;
+}
+
+.overviewItemText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.overviewItemChanged .overviewItemText {
+  color: $color-primary;
+}
+
 .legend {
   display: flex;
   justify-content: center;
@@ -162,16 +267,34 @@
 .diffSection {
   background: $color-bg-card;
   border-radius: $radius-lg;
-  padding: $spacing-lg;
   margin-bottom: $spacing-lg;
+  overflow: hidden;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
-  margin-bottom: $spacing-md;
-  padding-bottom: $spacing-md;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  cursor: pointer;
+  user-select: none;
   border-bottom: 1rpx solid $color-border-light;
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.sectionArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  transition: transform 0.2s ease;
+}
+
+.sectionArrowExpanded {
+  transform: rotate(90deg);
 }
 
 .sectionTitle {
@@ -186,12 +309,27 @@
   margin-left: $spacing-sm;
 }
 
+.changeDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-pill;
+  background: $color-primary;
+  margin-left: $spacing-sm;
+}
+
+.sectionMeta {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  background: $color-bg-primary-light;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+}
+
 .diffBox {
   font-size: $font-size-md;
   line-height: 1.8;
-  padding: $spacing-md;
+  padding: $spacing-lg;
   background: $color-bg-page;
-  border-radius: $radius-md;
 }
 
 .diffUnchanged {

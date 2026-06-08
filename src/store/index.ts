@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import Taro from '@tarojs/taro';
 import { Article, ArticleStatus } from '@/types/article';
 import { Category } from '@/types/category';
-import { ReviewRecord, ReviewStatus } from '@/types/review';
+import { ReviewRecord, ReviewStatus, ReviewHistoryItem } from '@/types/review';
 import { mockArticles } from '@/data/mockArticles';
 import { mockCategories } from '@/data/mockCategories';
 import { mockReviews } from '@/data/mockReviews';
@@ -141,19 +141,37 @@ export const useAppStore = create<AppState>()(
         const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
         const currentArticle = get().articles.find(a => a.id === review.articleId);
         
+        const history: ReviewHistoryItem[] = [
+          {
+            id: `h${Date.now()}`,
+            version: review.version,
+            status: review.status,
+            submitter: review.submitter,
+            submitTime: review.submitTime,
+            reviewer: review.reviewer,
+            reviewTime: review.reviewTime,
+            reviewComment: review.reviewComment
+          }
+        ];
+        
+        if (review.history) {
+          history.unshift(...review.history);
+        }
+        
         const newReview: ReviewRecord = {
           ...review,
-          id: `r${Date.now()}`,
+          id: review.id,
           status: 'pending',
           submitTime: now,
           version: review.version + 1,
           reviewer: undefined,
           reviewTime: undefined,
-          reviewComment: undefined
+          reviewComment: undefined,
+          history
         };
 
         set(state => ({
-          reviews: [newReview, ...state.reviews.filter(r => r.id !== id)],
+          reviews: state.reviews.map(r => r.id === id ? newReview : r),
           articles: state.articles.map(a =>
             a.id === review.articleId
               ? {
@@ -259,13 +277,33 @@ export const useAppStore = create<AppState>()(
         console.log('[Store] 提交文章审核:', article.id, article.title);
         const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
         
-        const existingReviewIndex = get().reviews.findIndex(
-          r => r.articleId === article.id
-        );
+        const existingReview = get().reviews.find(r => r.articleId === article.id);
+        const existingReviewIndex = existingReview 
+          ? get().reviews.findIndex(r => r.articleId === article.id)
+          : -1;
+
+        const history: ReviewHistoryItem[] = [];
+        
+        if (existingReview) {
+          history.push({
+            id: `h${Date.now()}`,
+            version: existingReview.version,
+            status: existingReview.status,
+            submitter: existingReview.submitter,
+            submitTime: existingReview.submitTime,
+            reviewer: existingReview.reviewer,
+            reviewTime: existingReview.reviewTime,
+            reviewComment: existingReview.reviewComment
+          });
+          
+          if (existingReview.history) {
+            history.unshift(...existingReview.history);
+          }
+        }
 
         const newReview: ReviewRecord = {
           ...review,
-          id: existingReviewIndex >= 0 ? get().reviews[existingReviewIndex].id : `r${Date.now()}`,
+          id: existingReviewIndex >= 0 ? existingReview!.id : `r${Date.now()}`,
           articleId: article.id,
           articleTitle: article.title,
           articleCover: article.coverImage,
@@ -275,13 +313,14 @@ export const useAppStore = create<AppState>()(
           status: 'pending' as ReviewStatus,
           reviewer: undefined,
           reviewTime: undefined,
-          reviewComment: undefined
+          reviewComment: undefined,
+          history
         };
 
         set(state => {
           let newReviews;
           if (existingReviewIndex >= 0) {
-            console.log('[Store] 更新已有审核记录为待审核');
+            console.log('[Store] 更新已有审核记录为待审核，历史记录数:', history.length);
             newReviews = state.reviews.map(r =>
               r.articleId === article.id ? newReview : r
             );

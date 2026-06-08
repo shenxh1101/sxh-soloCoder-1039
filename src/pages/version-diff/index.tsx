@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, Picker } from '@tarojs/components';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { View, Text, ScrollView, Picker, Button } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import { useAppStore } from '@/store';
-import { ArticleVersion } from '@/types/article';
 import styles from './index.module.scss';
 
 type DiffType = 'unchanged' | 'added' | 'removed' | 'modified';
@@ -18,6 +17,15 @@ interface DiffBlock {
   type: DiffType;
   segments: DiffSegment[];
   label?: string;
+  paragraphIndex?: number;
+}
+
+interface ChangeOverview {
+  field: 'title' | 'summary' | 'content';
+  fieldName: string;
+  hasChange: boolean;
+  changeDesc?: string;
+  paragraphIndex?: number;
 }
 
 const VersionDiffPage: React.FC = () => {
@@ -29,6 +37,15 @@ const VersionDiffPage: React.FC = () => {
   
   const [oldVersionIndex, setOldVersionIndex] = useState(0);
   const [newVersionIndex, setNewVersionIndex] = useState(1);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    title: true,
+    summary: true,
+    content: true
+  });
+  const [showOnlyChanges, setShowOnlyChanges] = useState(false);
+  
+  const contentRef = useRef<any>(null);
+  const sectionRefs = useRef<Record<string, any>>({});
 
   useEffect(() => {
     console.log('[VersionDiff] 页面初始化，文章ID:', articleId);
@@ -192,12 +209,15 @@ const VersionDiffPage: React.FC = () => {
     const maxLines = Math.max(oldLines.length, newLines.length);
     
     let i = 0;
+    let paragraphCount = 0;
+    
     while (i < maxLines) {
       const oldLine = oldLines[i] || '';
       const newLine = newLines[i] || '';
       
       if (oldLine === newLine) {
         const unchangedSegments: DiffSegment[] = [];
+        let startI = i;
         while (i < maxLines && oldLines[i] === newLines[i]) {
           unchangedSegments.push({
             type: 'unchanged',
@@ -206,11 +226,17 @@ const VersionDiffPage: React.FC = () => {
           });
           i++;
         }
-        blocks.push({ type: 'unchanged', segments: unchangedSegments });
+        blocks.push({ 
+          type: 'unchanged', 
+          segments: unchangedSegments,
+          paragraphIndex: startI
+        });
       } else {
+        paragraphCount++;
         const modifiedSegments: DiffSegment[] = [];
         let blockOld = '';
         let blockNew = '';
+        let startI = i;
         
         while (i < maxLines && oldLines[i] !== newLines[i]) {
           if (blockOld) blockOld += '\n';
@@ -224,7 +250,8 @@ const VersionDiffPage: React.FC = () => {
         blocks.push({ 
           type: 'modified', 
           segments,
-          label: '修改段落'
+          label: `第 ${paragraphCount} 处修改`,
+          paragraphIndex: startI
         });
       }
     }
@@ -254,6 +281,69 @@ const VersionDiffPage: React.FC = () => {
   const hasSummaryChanges = summaryDiff.some(s => s.type !== 'unchanged');
   const hasContentChanges = contentBlocks.some(b => b.type !== 'unchanged');
 
+  const changedParagraphs = useMemo(() => {
+    return contentBlocks
+      .filter(b => b.type === 'modified')
+      .map(b => ({
+        index: b.paragraphIndex !== undefined ? b.paragraphIndex : 0,
+        label: b.label || '修改段落'
+      }));
+  }, [contentBlocks]);
+
+  const changeOverview: ChangeOverview[] = useMemo(() => {
+    const overview: ChangeOverview[] = [];
+    
+    if (hasTitleChanges) {
+      overview.push({
+        field: 'title',
+        fieldName: '标题',
+        hasChange: true,
+        changeDesc: '标题已修改'
+      });
+    } else {
+      overview.push({
+        field: 'title',
+        fieldName: '标题',
+        hasChange: false
+      });
+    }
+    
+    if (hasSummaryChanges) {
+      overview.push({
+        field: 'summary',
+        fieldName: '摘要',
+        hasChange: true,
+        changeDesc: '摘要已修改'
+      });
+    } else {
+      overview.push({
+        field: 'summary',
+        fieldName: '摘要',
+        hasChange: false
+      });
+    }
+    
+    if (hasContentChanges) {
+      changedParagraphs.forEach((p, i) => {
+        overview.push({
+          field: 'content',
+          fieldName: '正文',
+          hasChange: true,
+          changeDesc: p.label,
+          paragraphIndex: p.index
+        });
+      });
+    } else {
+      overview.push({
+        field: 'content',
+        fieldName: '正文',
+        hasChange: false
+      });
+    }
+    
+    return overview;
+  }, [hasTitleChanges, hasSummaryChanges, hasContentChanges, changedParagraphs]);
+
   const handleOldVersionChange = (e) => {
     const index = parseInt(e.detail.value);
     if (index < newVersionIndex) {
@@ -269,6 +359,22 @@ const VersionDiffPage: React.FC = () => {
       setNewVersionIndex(index);
     } else {
       Taro.showToast({ title: '新版本必须晚于旧版本', icon: 'none' });
+    }
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const scrollToSection = (overview: ChangeOverview) => {
+    const sectionKey = overview.field + (overview.paragraphIndex !== undefined ? `-${overview.paragraphIndex}` : '');
+    const element = sectionRefs.current[sectionKey];
+    if (element && contentRef.current) {
+      console.log('[VersionDiff] 跳转到:', sectionKey);
+      element.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -342,9 +448,21 @@ const VersionDiffPage: React.FC = () => {
 
   const renderContentBlocks = () => {
     return contentBlocks.map((block, blockIndex) => {
+      const paragraphKey = `content-${block.paragraphIndex}`;
+      const isModified = block.type === 'modified';
+      
+      if (showOnlyChanges && !isModified) {
+        return null;
+      }
+      
       if (block.type === 'unchanged') {
         return (
-          <View key={blockIndex} className={styles.unchangedBlock}>
+          <View 
+            key={blockIndex} 
+            id={paragraphKey}
+            ref={el => { if (el) sectionRefs.current[paragraphKey] = el; }}
+            className={styles.unchangedBlock}
+          >
             {block.segments.map((seg, segIndex) => (
               <Text key={segIndex} className={styles.diffUnchanged}>
                 {seg.newContent}
@@ -357,7 +475,12 @@ const VersionDiffPage: React.FC = () => {
       
       if (block.type === 'modified') {
         return (
-          <View key={blockIndex} className={styles.modifiedSection}>
+          <View 
+            key={blockIndex}
+            id={paragraphKey}
+            ref={el => { if (el) sectionRefs.current[paragraphKey] = el; }}
+            className={styles.modifiedSection}
+          >
             {block.label && (
               <View className={styles.sectionBadge}>
                 <Text className={styles.badgeText}>{block.label}</Text>
@@ -373,6 +496,8 @@ const VersionDiffPage: React.FC = () => {
       return null;
     });
   };
+
+  const totalChanges = changeOverview.filter(c => c.hasChange).length;
 
   return (
     <View className={styles.page}>
@@ -415,6 +540,52 @@ const VersionDiffPage: React.FC = () => {
         </View>
       </View>
 
+      <View className={styles.overviewSection}>
+        <View className={styles.overviewHeader}>
+          <Text className={styles.overviewTitle}>变更概览</Text>
+          <View className={styles.overviewActions}>
+            <Button 
+              className={classnames(
+                styles.filterBtn,
+                showOnlyChanges && styles.filterBtnActive
+              )}
+              onClick={() => setShowOnlyChanges(!showOnlyChanges)}
+            >
+              <Text className={styles.filterBtnText}>
+                {showOnlyChanges ? '显示全部' : '只看修改'}
+              </Text>
+            </Button>
+          </View>
+        </View>
+        <Text className={styles.overviewCount}>共 {totalChanges} 处变更</Text>
+        
+        <ScrollView 
+          className={styles.overviewList}
+          scrollX
+          enhanced
+          showScrollbar={false}
+        >
+          {changeOverview.map((item, index) => (
+            <Button
+              key={index}
+              className={classnames(
+                styles.overviewItem,
+                item.hasChange ? styles.overviewItemChanged : styles.overviewItemUnchanged
+              )}
+              onClick={() => item.hasChange && scrollToSection(item)}
+              disabled={!item.hasChange}
+            >
+              <View className={styles.overviewDot} />
+              <Text className={styles.overviewItemText}>
+                {item.fieldName}
+                {item.changeDesc && `：${item.changeDesc}`}
+                {!item.hasChange && '（无变化）'}
+              </Text>
+            </Button>
+          ))}
+        </ScrollView>
+      </View>
+
       <View className={styles.legend}>
         <View className={styles.legendItem}>
           <View className={classnames(styles.legendBox, styles.legendAdded)} />
@@ -434,38 +605,88 @@ const VersionDiffPage: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView className={styles.diffContent} scrollY>
-        <View className={styles.diffSection}>
-          <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>标题</Text>
-            {!hasTitleChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+      <ScrollView 
+        className={styles.diffContent} 
+        scrollY 
+        ref={contentRef}
+        enhanced
+        showScrollbar
+      >
+        <View 
+          className={styles.diffSection}
+          id="title"
+          ref={el => { if (el) sectionRefs.current['title'] = el; }}
+        >
+          <View className={styles.sectionHeader} onClick={() => toggleSection('title')}>
+            <View className={styles.sectionHeaderLeft}>
+              <Text className={classnames(
+                styles.sectionArrow,
+                expandedSections.title && styles.sectionArrowExpanded
+              )}>›</Text>
+              <Text className={styles.sectionTitle}>标题</Text>
+              {!hasTitleChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+              {hasTitleChanges && <View className={styles.changeDot} />}
+            </View>
           </View>
-          <View className={styles.diffBox}>
-            {renderDiffSegments(titleDiff, true)}
-          </View>
+          {expandedSections.title && (
+            <View className={styles.diffBox}>
+              {renderDiffSegments(titleDiff, true)}
+            </View>
+          )}
         </View>
 
-        <View className={styles.diffSection}>
-          <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>摘要</Text>
-            {!hasSummaryChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+        <View 
+          className={styles.diffSection}
+          id="summary"
+          ref={el => { if (el) sectionRefs.current['summary'] = el; }}
+        >
+          <View className={styles.sectionHeader} onClick={() => toggleSection('summary')}>
+            <View className={styles.sectionHeaderLeft}>
+              <Text className={classnames(
+                styles.sectionArrow,
+                expandedSections.summary && styles.sectionArrowExpanded
+              )}>›</Text>
+              <Text className={styles.sectionTitle}>摘要</Text>
+              {!hasSummaryChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+              {hasSummaryChanges && <View className={styles.changeDot} />}
+            </View>
           </View>
-          <View className={styles.diffBox}>
-            {(oldVersion.summary || newVersion.summary) 
-              ? renderDiffSegments(summaryDiff, true)
-              : <Text className={styles.emptyText}>无摘要</Text>
-            }
-          </View>
+          {expandedSections.summary && (
+            <View className={styles.diffBox}>
+              {(oldVersion.summary || newVersion.summary) 
+                ? renderDiffSegments(summaryDiff, true)
+                : <Text className={styles.emptyText}>无摘要</Text>
+              }
+            </View>
+          )}
         </View>
 
-        <View className={styles.diffSection}>
-          <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>正文</Text>
-            {!hasContentChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+        <View 
+          className={styles.diffSection}
+          id="content"
+          ref={el => { if (el) sectionRefs.current['content'] = el; }}
+        >
+          <View className={styles.sectionHeader} onClick={() => toggleSection('content')}>
+            <View className={styles.sectionHeaderLeft}>
+              <Text className={classnames(
+                styles.sectionArrow,
+                expandedSections.content && styles.sectionArrowExpanded
+              )}>›</Text>
+              <Text className={styles.sectionTitle}>正文</Text>
+              {!hasContentChanges && <Text className={styles.sectionNoChange}>（无变化）</Text>}
+              {hasContentChanges && <View className={styles.changeDot} />}
+            </View>
+            {hasContentChanges && (
+              <Text className={styles.sectionMeta}>
+                {changedParagraphs.length} 处修改
+              </Text>
+            )}
           </View>
-          <View className={styles.diffBox}>
-            {renderContentBlocks()}
-          </View>
+          {expandedSections.content && (
+            <View className={styles.diffBox}>
+              {renderContentBlocks()}
+            </View>
+          )}
         </View>
 
         <View className={styles.versionInfo}>

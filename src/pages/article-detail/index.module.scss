@@ -2,29 +2,323 @@
 
 .page {
   min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.emptyState {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: $page-padding;
-  background-color: $color-bg-page;
+  text-align: center;
 }
 
-.icon {
+.emptyIcon {
   font-size: 160rpx;
   margin-bottom: $spacing-lg;
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
-.title {
+.emptyTitle {
   font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-md;
 }
 
-.desc {
+.emptyDesc {
   font-size: $font-size-md;
   color: $color-text-tertiary;
+  line-height: 1.8;
+}
+
+.coverSection {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+  overflow: hidden;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+}
+
+.coverOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-xl $page-padding $spacing-lg;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+.coverTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-inverse;
+  line-height: 1.5;
+}
+
+.content {
+  padding: $spacing-lg $page-padding;
+}
+
+.metaSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.metaLabel {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.metaValue {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.summaryText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: 1.8;
+}
+
+.contentText {
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.contentInner {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 2;
+  white-space: pre-wrap;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tagItem {
+  background: $color-bg-primary-light;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.imagesList {
+  display: flex;
+  gap: $spacing-md;
+  white-space: nowrap;
+}
+
+.contentImage {
+  width: 300rpx;
+  height: 200rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+}
+
+.versionInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.versionText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.viewDiffBtn {
+  height: 56rpx;
+  padding: 0 $spacing-lg;
+  background: $color-bg-primary-light;
+  border-radius: $radius-pill;
+
+  &::after { border: none; }
+}
+
+.viewDiffText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.timeline {
+  position: relative;
+  padding-left: $spacing-lg;
+}
+
+.timelineItem {
+  position: relative;
+  padding-bottom: $spacing-xl;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.timelineDot {
+  position: absolute;
+  left: -$spacing-lg;
+  top: $spacing-xs;
+  width: 24rpx;
+  height: 24rpx;
+  background: $color-primary;
+  border-radius: $radius-pill;
+  z-index: 1;
+}
+
+.timelineLine {
+  position: absolute;
+  left: calc(-$spacing-lg + 11rpx);
+  top: $spacing-lg;
+  bottom: 0;
+  width: 2rpx;
+  background: $color-border-light;
+}
+
+.timelineLineLast {
+  display: none;
+}
+
+.timelineContent {
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.timelineHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.timelineVersion {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.timelineMeta {
+  margin-bottom: $spacing-xs;
+}
+
+.timelineText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.timelineComment {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-border-light;
+}
+
+.timelineCommentLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.timelineCommentText {
+  font-size: $font-size-sm;
+  color: $color-danger;
+  line-height: 1.6;
+}
+
+.statsSection {
+  display: flex;
+  justify-content: space-around;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl $spacing-lg;
+  margin-top: $spacing-md;
+}
+
+.statItem {
   text-align: center;
+}
+
+.statNumber {
+  display: block;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  border-top: 1rpx solid $color-border-light;
+  z-index: 100;
+}
+
+.editBtn {
+  width: 100%;
+  height: 88rpx;
+  background: $color-primary-gradient;
+  border-radius: $radius-pill;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after { border: none; }
+}
+
+.editBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-inverse;
 }

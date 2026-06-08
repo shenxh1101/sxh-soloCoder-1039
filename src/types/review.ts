@@ -12,6 +12,18 @@ export interface ReviewRecord {
   reviewTime?: string;
   reviewComment?: string;
   version: number;
+  history?: ReviewHistoryItem[];
+}
+
+export interface ReviewHistoryItem {
+  id: string;
+  version: number;
+  status: ReviewStatus;
+  submitter: string;
+  submitTime: string;
+  reviewer?: string;
+  reviewTime?: string;
+  reviewComment?: string;
 }
 
 export interface ReviewDiff {

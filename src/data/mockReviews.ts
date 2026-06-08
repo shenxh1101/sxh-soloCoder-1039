@@ -24,15 +24,37 @@ export const mockReviews: ReviewRecord[] = [
   {
     id: 'r3',
     articleId: '3',
-    articleTitle: '微信公众号改版后的运营策略调整',
+    articleTitle: '微信公众号改版后的运营策略深度调整指南',
     articleCover: 'https://picsum.photos/id/6/750/500',
     status: 'rejected',
     submitter: '王芳',
-    submitTime: '2024-06-08 11:30:00',
+    submitTime: '2024-06-09 10:30:00',
     reviewer: '张主管',
-    reviewTime: '2024-06-08 17:00:00',
-    reviewComment: '内容分析不够深入，缺少具体数据支撑；建议补充2024年最新的运营案例。另外，第3部分的策略建议过于笼统，请细化到可执行的操作步骤。',
-    version: 2
+    reviewTime: '2024-06-09 10:45:00',
+    reviewComment: '标题和摘要虽然改进了，但正文部分仍然缺乏深度。建议增加更多实战案例和数据对比。',
+    version: 2,
+    history: [
+      {
+        id: 'h1',
+        version: 1,
+        status: 'pending',
+        submitter: '王芳',
+        submitTime: '2024-06-08 11:00:00',
+        reviewer: undefined,
+        reviewTime: undefined,
+        reviewComment: undefined
+      },
+      {
+        id: 'h2',
+        version: 1,
+        status: 'rejected',
+        submitter: '王芳',
+        submitTime: '2024-06-08 11:00:00',
+        reviewer: '张主管',
+        reviewTime: '2024-06-08 17:00:00',
+        reviewComment: '内容分析不够深入，缺少具体数据支撑；建议补充2024年最新的运营案例。另外，第3部分的策略建议过于笼统，请细化到可执行的操作步骤。'
+      }
+    ]
   },
   {
     id: 'r4',
